@@ -5,9 +5,9 @@
 </template>
 
 <script>
-    export default {
-        name: "SwiperItem"
-    }
+	export default {
+		name: "Slide"
+	}
 </script>
 
 <style scoped>

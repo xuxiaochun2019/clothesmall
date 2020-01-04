@@ -3,62 +3,21 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-    <home-swiper :banners="banners"/>
-    <home-recommend-view :recommends="recommends"></home-recommend-view>
-    <home-feature-view></home-feature-view>
-    <tab-control class="tab-control" :title="title"></tab-control>
-    <goods-list :goods="goods['pop'].list" />
-    <ul>
-      <li>列表1</li>
-      <li>列表2</li>
-      <li>列表3</li>
-      <li>列表4</li>
-      <li>列表5</li>
-      <li>列表6</li>
-      <li>列表7</li>
-      <li>列表8</li>
-      <li>列表9</li>
-      <li>列表10</li>
-      <li>列表11</li>
-      <li>列表12</li>
-      <li>列表13</li>
-      <li>列表14</li>
-      <li>列表15</li>
-      <li>列表16</li>
-      <li>列表17</li>
-      <li>列表18</li>
-      <li>列表19</li>
-      <li>列表20</li>
-      <li>列表21</li>
-      <li>列表22</li>
-      <li>列表23</li>
-      <li>列表24</li>
-      <li>列表25</li>
-      <li>列表26</li>
-      <li>列表27</li>
-      <li>列表28</li>
-      <li>列表29</li>
-      <li>列表30</li>
-      <li>列表31</li>
-      <li>列表32</li>
-      <li>列表33</li>
-      <li>列表34</li>
-      <li>列表35</li>
-      <li>列表36</li>
-      <li>列表37</li>
-      <li>列表38</li>
-      <li>列表39</li>
-      <li>列表40</li>
-      <li>列表41</li>
-      <li>列表42</li>
-      <li>列表43</li>
-      <li>列表44</li>
-      <li>列表45</li>
-      <li>列表46</li>
-      <li>列表47</li>
-      <li>列表48</li>
-
-    </ul>
+    <scroll class="content"
+            ref="scroll"
+            :probe-type="3"
+            :pull-up-load="true"
+            @scrollPosition="scrollPosition"
+            @upLoadMore="upLoadMore">
+      <home-swiper :banners="banners"/>
+      <home-recommend-view :recommends="recommends"></home-recommend-view>
+      <home-feature-view></home-feature-view>
+      <tab-control class="tab-control"
+                   :title="title"
+                   @tabClick="tabClick"></tab-control>
+      <goods-list :goods="showGoods"/>
+    </scroll>
+    <back-top @click.native="backTop" v-show="isShowBackTop"/>
   </div>
 </template>
 
@@ -66,13 +25,15 @@
   import NavBar from 'components/common/navbar/NavBar'
   import TabControl from 'components/common/tabcontrol/TabControl'
   import GoodsList from 'components/content/goods/GoodsList'
-  // import GoodsListItem from 'components/content/goods/GoodsListItem'
+  import Scroll from 'components/common/scroll/Scroll'
+  import BackTop from 'components/content/backtop/BackTop'
+
 
   import HomeSwiper from './childCompnts/HomeSwiper'
   import HomeRecommendView from './childCompnts/HomeRecommendView'
   import HomeFeatureView from './childCompnts/HomeFeatureView'
 
-  import {getHomeMultidata,getHomeGoods} from "network/home"
+  import {getHomeMultidata, getHomeGoods} from "network/home"
 
   export default {
     name: "Home",
@@ -80,7 +41,8 @@
       NavBar,
       TabControl,
       GoodsList,
-      // GoodsListItem,
+      Scroll,
+      BackTop,
       HomeSwiper,
       HomeRecommendView,
       HomeFeatureView
@@ -89,24 +51,57 @@
       return {
         banners: [],
         recommends: [],
-        title: ["流行", "新款", "精选"],
+        title: ["流行", "精选"],
         goods: {
           'pop': {page: 0, list: []},
           'news': {page: 0, list: []},
           'sell': {page: 0, list: []}
-        }
+        },
+        currentType: 'pop',
+        isShowBackTop: false
+      }
+    },
+    computed: {
+      showGoods() {
+        return this.goods[this.currentType].list;
       }
     },
     created() {
       //1.请求首页多个数据
-      this.getHomeMultidata(),
+      this.getHomeMultidata();
       // 请求首页商品数据
-      this.getHomeGoods('pop'),
-      this.getHomeGoods('news'),
-      this.getHomeGoods('sell')
+      this.getHomeGoods('pop');
+      /*this.getHomeGoods('news');*/
+      this.getHomeGoods('sell');
 
     },
     methods: {
+      /*
+      事件监听相关方法
+      */
+      tabClick(index) {
+        switch (index) {
+          case 0:
+            this.currentType = 'pop'
+            break;
+          case 1:
+            this.currentType = 'sell'
+            break;
+        }
+      },
+      backTop() {
+        this.$refs.scroll.scrollTo(0, 0, 500);
+      },
+      scrollPosition(position) {
+        this.isShowBackTop = -position.y > 600;
+      },
+      upLoadMore() {
+        this.getHomeGoods(this.currentType);
+        this.$refs.scroll.finishPullUp();
+      },
+      /*
+         网络请求相关方法
+       */
       //请求首页多个数据
       getHomeMultidata() {
         getHomeMultidata().then(res => {
@@ -114,9 +109,10 @@
           this.recommends = res.data.recommend.list;
         })
       },
+      // 请求首页商品数据
       getHomeGoods(type) {
         const page = this.goods[type].page + 1;
-        getHomeGoods(type, page).then( res => {
+        getHomeGoods(type, page).then(res => {
           this.goods[type].list.push(...res.data.list);
           this.goods[type].page += 1;
         })
@@ -127,7 +123,9 @@
 
 <style scoped>
   #home {
-    padding-top: 44px;
+    /*padding-top: 44px;*/
+    height: 100vh;
+    /*position: relative;*/
   }
 
   .home-nav {
@@ -143,8 +141,19 @@
 
   .tab-control {
     background-color: white;
-    position: sticky;
+    /* better-scroll中失效*/
+    /*position: sticky;*/
     top: 44px;
     z-index: 99;
+  }
+
+  /*.content{
+   position: absolute;
+    top: 44px;
+    bottom: 49px;
+  }*/
+  .content {
+    height: calc(100% - 93px);
+    margin-top: 44px;
   }
 </style>

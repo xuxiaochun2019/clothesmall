@@ -81,13 +81,13 @@
     },
     mounted() {
       // 监听事件总线中的事件(图片加载完成)
-      const refresh = debounce(this.$refs.scroll.refresh, 500);
+      const refresh = debounce(this.$refs.scroll.refresh,500);
       this.$bus.$on('itemImgUpLoad', () => {
         refresh();
       })
     },
     activated(){
-      this.$refs.scroll.scroll.scrollTo(0,this.saveY,0);
+      this.$refs.scroll.scrollTo(0,this.saveY,1);
       this.$refs.scroll.refresh();
     },
     deactivated(){

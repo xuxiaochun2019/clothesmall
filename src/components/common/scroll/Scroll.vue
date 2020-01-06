@@ -29,6 +29,7 @@
     methods: {
       //返回滚动的坐标
       scrollTo(x, y, time = 300) {
+        // if(!time) time = 300
         this.scroll && this.scroll.scrollTo(x, y, time);
       },
       //完成上拉加载更多需要调用一次，否则无法继续加载更多

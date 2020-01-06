@@ -1,5 +1,5 @@
 <template>
-  <div class="goods-list-item">
+  <div class="goods-list-item" @click="itemClick">
     <img :src="goodsitem.show.img" alt="" @load='imgLoad'>
     <div class="goods-item-text">
       <p class="title">{{goodsitem.title}}</p>
@@ -24,6 +24,9 @@
     methods:{
       imgLoad(){
         this.$bus.$emit('itemImgUpLoad');
+      },
+      itemClick(){
+        console.log("详情页");
       }
     }
   }

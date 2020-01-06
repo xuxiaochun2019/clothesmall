@@ -3,18 +3,17 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
+    <tab-control class="tab-control" :title="title" @tabClick="tabClick" ref="tabControl1" v-show="isTabFixed"></tab-control>
     <scroll class="content"
             ref="scroll"
             :probe-type="3"
             :pull-up-load="true"
             @scrollPosition="scrollPosition"
             @upLoadMore="upLoadMore">
-      <home-swiper :banners="banners"/>
+      <home-swiper :banners="banners" @bannerImgLoad="bannerImgLoad"/>
       <home-recommend-view :recommends="recommends"></home-recommend-view>
       <home-feature-view></home-feature-view>
-      <tab-control class="tab-control"
-                   :title="title"
-                   @tabClick="tabClick"></tab-control>
+      <tab-control :title="title" @tabClick="tabClick" ref="tabControl2"></tab-control>
       <goods-list :goods="showGoods"/>
     </scroll>
     <back-top @click.native="backTop" v-show="isShowBackTop"/>
@@ -33,6 +32,7 @@
   import HomeRecommendView from './childCompnts/HomeRecommendView'
   import HomeFeatureView from './childCompnts/HomeFeatureView'
 
+  import {debounce} from 'common/utils'
   import {getHomeMultidata, getHomeGoods} from "network/home"
 
   export default {
@@ -58,7 +58,12 @@
           'sell': {page: 0, list: []}
         },
         currentType: 'pop',
-        isShowBackTop: false
+        isShowBackTop: false,
+        isTabFixed: false,
+        saveY: {
+          type: Number,
+          default: 0
+        }
       }
     },
     computed: {
@@ -73,12 +78,28 @@
       this.getHomeGoods('pop');
       /*this.getHomeGoods('news');*/
       this.getHomeGoods('sell');
-
+    },
+    mounted() {
+      // 监听事件总线中的事件(图片加载完成)
+      const refresh = debounce(this.$refs.scroll.refresh, 500);
+      this.$bus.$on('itemImgUpLoad', () => {
+        refresh();
+      })
+    },
+    activated(){
+      this.$refs.scroll.scroll.scrollTo(0,this.saveY,0);
+      this.$refs.scroll.refresh();
+    },
+    deactivated(){
+      this.saveY = Number(this.$refs.scroll.getY())
     },
     methods: {
       /*
       事件监听相关方法
       */
+      bannerImgLoad() {
+        this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop
+      },
       tabClick(index) {
         switch (index) {
           case 0:
@@ -88,16 +109,23 @@
             this.currentType = 'sell'
             break;
         }
+        this.$refs.tabControl1.currentIndex = index;
+        this.$refs.tabControl2.currentIndex = index;
       },
       backTop() {
         this.$refs.scroll.scrollTo(0, 0, 500);
       },
+      //判断scroll距离
       scrollPosition(position) {
+        //1判断BackTop是否显示
         this.isShowBackTop = -position.y > 600;
+        //决定tabControl是否吸顶（position: fixed）
+        this.isTabFixed = -position.y > this.$refs.tabControl2.$el.offsetTop
+
       },
+      //上拉加载更多
       upLoadMore() {
         this.getHomeGoods(this.currentType);
-        this.$refs.scroll.finishPullUp();
       },
       /*
          网络请求相关方法
@@ -115,6 +143,8 @@
         getHomeGoods(type, page).then(res => {
           this.goods[type].list.push(...res.data.list);
           this.goods[type].page += 1;
+          //完成上拉加载更多
+          this.$refs.scroll.finishPullUp();
         })
       }
     }
@@ -123,37 +153,29 @@
 
 <style scoped>
   #home {
-    /*padding-top: 44px;*/
     height: 100vh;
-    /*position: relative;*/
   }
 
   .home-nav {
     background-color: var(--color-tint);
     color: white;
-
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 99;
+    position: relative;
+    z-index:99;
   }
 
-  .tab-control {
-    background-color: white;
-    /* better-scroll中失效*/
-    /*position: sticky;*/
-    top: 44px;
-    z-index: 99;
-  }
-
-  /*.content{
-   position: absolute;
-    top: 44px;
-    bottom: 49px;
-  }*/
   .content {
     height: calc(100% - 93px);
-    margin-top: 44px;
+    position: absolute;
+    top:44px;
+    bottom: 49px;
+    left: 0;
+    right: 0;
   }
+
+  .tab-control{
+    position: relative;
+    z-index: 99;
+    background-color: white;
+  }
+
 </style>

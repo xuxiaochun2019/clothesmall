@@ -26,7 +26,16 @@
         this.$bus.$emit('itemImgUpLoad');
       },
       itemClick(){
-        console.log("详情页");
+        // 动态路由
+        this.$router.push('/details/'+this.goodsitem.iid);
+        // query方式
+        /*this.$router.push({
+          path: '/details',
+          query: {
+            lid: this.goodsitem.iid,
+            type: '***'
+          }
+        })*/
       }
     }
   }

@@ -5,6 +5,7 @@
       <details-swiper :top-imgs="topImgs"/>
       <details-info :goods="goods"/>
       <details-shop :shop="shop"/>
+      <details-info-down :details-info="detailsInfo"/>
     </scroll>
   </div>
 </template>
@@ -49,13 +50,13 @@
         /*console.log(this.topImgs);*/
         //获取商品信息
         this.goods = new Goods(data.itemInfo, data.columns, data.shopInfo.services);
-        console.log(this.goods);
+        // console.log(this.goods);
         //获取商家信息
         this.shop = new Shop(data.shopInfo);
-        console.log(this.shop);
+        // console.log(this.shop);
         //保存商品详情数据
         this.detailsInfo = data.detailInfo;
-
+        console.log(this.detailsInfo);
       })
     }
   }

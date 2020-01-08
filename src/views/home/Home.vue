@@ -3,7 +3,8 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-    <tab-control class="tab-control" :title="title" @tabClick="tabClick" ref="tabControl1" v-show="isTabFixed"></tab-control>
+    <tab-control class="tab-control" :title="title" @tabClick="tabClick" ref="tabControl1"
+                 v-show="isTabFixed"></tab-control>
     <scroll class="content"
             ref="scroll"
             :probe-type="3"
@@ -32,8 +33,8 @@
   import HomeRecommendView from './childCompnts/HomeRecommendView'
   import HomeFeatureView from './childCompnts/HomeFeatureView'
 
-  import {debounce} from 'common/utils'
   import {getHomeMultidata, getHomeGoods} from "network/home"
+  import {itemListenerMixin} from "common/mixin";
 
   export default {
     name: "Home",
@@ -47,6 +48,7 @@
       HomeRecommendView,
       HomeFeatureView
     },
+    mixins: [itemListenerMixin],
     data() {
       return {
         banners: [],
@@ -79,19 +81,14 @@
       /*this.getHomeGoods('news');*/
       this.getHomeGoods('sell');
     },
-    mounted() {
-      // 监听事件总线中的事件(图片加载完成)
-      const refresh = debounce(this.$refs.scroll.refresh,500);
-      this.$bus.$on('itemImgUpLoad', () => {
-        refresh();
-      })
-    },
-    activated(){
-      this.$refs.scroll.scrollTo(0,this.saveY,1);
+    activated() {
+      this.$refs.scroll.scrollTo(0, this.saveY, 1);
       this.$refs.scroll.refresh();
     },
-    deactivated(){
+    deactivated() {
       this.saveY = Number(this.$refs.scroll.getY())
+      //取消全局事件得监听
+      this.$bus.$off('itemImgUpLoad', this.itemImgListener)
     },
     methods: {
       /*
@@ -160,19 +157,19 @@
     background-color: var(--color-tint);
     color: white;
     position: relative;
-    z-index:99;
+    z-index: 99;
   }
 
   .content {
     height: calc(100% - 93px);
     position: absolute;
-    top:44px;
+    top: 44px;
     bottom: 49px;
     left: 0;
     right: 0;
   }
 
-  .tab-control{
+  .tab-control {
     position: relative;
     z-index: 99;
     background-color: white;

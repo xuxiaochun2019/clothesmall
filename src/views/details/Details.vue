@@ -14,6 +14,8 @@
       <details-comment :comment-info="commentInfo" ref="comment"/>
       <goods-list :goods="recommends" ref="recommends"/>
     </scroll>
+    <back-top @click.native="backTop" v-show="isShowBackTop"/>
+    <details-bottom-bar @addToCart="addToCart"/>
   </div>
 </template>
 
@@ -25,12 +27,13 @@
   import DetailsInfoDown from './childCompnts/DetailsInfoDown'
   import DetailsParams from './childCompnts/DetailsParams'
   import DetailsComment from './childCompnts/DetailsComment'
+  import DetailsBottomBar from './childCompnts/DetailsBottomBar'
 
   import Scroll from 'components/common/scroll/Scroll'
   import GoodsList from 'components/content/goods/GoodsList'
 
   import {getDetails, Goods, Shop, GoodsParam, getRecommend} from 'network/details'
-  import {itemListenerMixin} from "common/mixin"
+  import {itemListenerMixin, backTopMixin} from "common/mixin"
   import {debounce} from "common/utils"
 
   export default {
@@ -50,7 +53,7 @@
         currentIndex: 0 //记录当前主题区域值 0 1 2 3
       }
     },
-    mixins: [itemListenerMixin],
+    mixins: [itemListenerMixin, backTopMixin],
     components: {
       DetailsNavBar,
       DetailsSwiper,
@@ -60,6 +63,7 @@
       DetailsInfoDown,
       DetailsParams,
       DetailsComment,
+      DetailsBottomBar,
       GoodsList
     },
     created() {
@@ -102,7 +106,6 @@
         this.themeTopY.push(this.$refs.params.$el.offsetTop);
         this.themeTopY.push(this.$refs.comment.$el.offsetTop);
         this.themeTopY.push(this.$refs.recommends.$el.offsetTop);
-        console.log(this.themeTopY);
       }, 1000)
     },
     destroyed() {
@@ -123,12 +126,28 @@
         // position的区间决定主题高亮
         const len = this.themeTopY.length;
         for (let i = 0; i < len; i++) {
-          if (this.currentIndex !== i && (i < len-1 && positionY >= this.themeTopY[i] && positionY < this.themeTopY[i + 1]) || (i===len-1 && positionY>=this.themeTopY[i])) {
+          if (this.currentIndex !== i && (i < len - 1 && positionY >= this.themeTopY[i] && positionY < this.themeTopY[i + 1]) || (i === len - 1 && positionY >= this.themeTopY[i])) {
             this.currentIndex = i;
-            this.$refs.navbar.currentIndex = this.currentIndex;
-            console.log(i);
+            setTimeout(() => {
+              this.$refs.navbar.currentIndex = this.currentIndex;
+            }, 200);
           }
         }
+        //判断是否显示backTop
+        //1判断BackTop是否显示
+        this.isShowBackTop = -position.y > 600;
+      },
+      //添加购物车
+      addToCart() {
+        //选择购物车需要展示的信息  标题  价格
+        const product = {};
+        product.img = this.topImgs[0];
+        product.title = this.goods.title;
+        product.desc = this.goods.desc;
+        product.price = this.goods.nowPrice;
+        product.iid = this.iid;
+        //将商品添加到购物车
+        this.$store.dispatch('addCart', product)
       }
     }
   }
@@ -149,7 +168,7 @@
   }
 
   .content {
-    height: calc(100% - 44px);
+    height: calc(100% - 44px - 58px);
     position: absolute;
     top: 44px;
     bottom: 0;

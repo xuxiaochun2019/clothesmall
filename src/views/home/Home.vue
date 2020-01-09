@@ -26,15 +26,13 @@
   import TabControl from 'components/common/tabcontrol/TabControl'
   import GoodsList from 'components/content/goods/GoodsList'
   import Scroll from 'components/common/scroll/Scroll'
-  import BackTop from 'components/content/backtop/BackTop'
-
 
   import HomeSwiper from './childCompnts/HomeSwiper'
   import HomeRecommendView from './childCompnts/HomeRecommendView'
   import HomeFeatureView from './childCompnts/HomeFeatureView'
 
   import {getHomeMultidata, getHomeGoods} from "network/home"
-  import {itemListenerMixin} from "common/mixin";
+  import {itemListenerMixin,backTopMixin} from "common/mixin"
 
   export default {
     name: "Home",
@@ -43,12 +41,11 @@
       TabControl,
       GoodsList,
       Scroll,
-      BackTop,
       HomeSwiper,
       HomeRecommendView,
       HomeFeatureView
     },
-    mixins: [itemListenerMixin],
+    mixins: [itemListenerMixin,backTopMixin],
     data() {
       return {
         banners: [],
@@ -108,9 +105,6 @@
         }
         this.$refs.tabControl1.currentIndex = index;
         this.$refs.tabControl2.currentIndex = index;
-      },
-      backTop() {
-        this.$refs.scroll.scrollTo(0, 0, 500);
       },
       //判断scroll距离
       scrollPosition(position) {

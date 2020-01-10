@@ -35,6 +35,7 @@
   .cart-list {
     height: calc(100vh - 44px - 49px);
     overflow: hidden;
+    background-color: #eeeeda;
   }
 
   .content {

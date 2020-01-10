@@ -98,7 +98,8 @@
       getRecommend().then(res => {
         this.recommends = res.data.list
       })
-
+    },
+    mounted(){
       //給getThemeTopY赋值
       this.getThemeTopY = debounce(() => {
         this.themeTopY = [];
@@ -106,7 +107,7 @@
         this.themeTopY.push(this.$refs.params.$el.offsetTop);
         this.themeTopY.push(this.$refs.comment.$el.offsetTop);
         this.themeTopY.push(this.$refs.recommends.$el.offsetTop);
-      }, 1000)
+      }, 5000)
     },
     destroyed() {
       this.$bus.$off('itemImgUpLoad', this.itemImgListener)

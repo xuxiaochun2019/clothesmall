@@ -1,7 +1,7 @@
 <template>
   <div class="list-item">
     <div class="check-item">
-
+      <check-button :is-checked="product.checked" @click.native="itemClick"/>
     </div>
     <div class="content">
       <div class="img p3">
@@ -20,10 +20,24 @@
 </template>
 
 <script>
+  import CheckButton from './CheckButton'
   export default {
     name: "CartListItem",
     props: {
       product: {}
+    },
+    data(){
+      return {
+        isChecked: false
+      }
+    },
+    components:{
+      CheckButton
+    },
+    methods:{
+      itemClick(){
+        this.product.checked = !this.product.checked;
+      }
     }
   }
 </script>
@@ -40,7 +54,10 @@
 
   .check-item {
     flex: 1;
-    line-height: 100px;
+    line-height: 97px;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
   }
 
   .content {

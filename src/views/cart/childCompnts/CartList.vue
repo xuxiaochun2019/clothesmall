@@ -26,14 +26,13 @@
     },
     activated() {
      this.$refs.scroll.refresh();
-      console.log('33333');
     }
   }
 </script>
 
 <style scoped>
   .cart-list {
-    height: calc(100vh - 44px - 49px);
+    height: calc(100vh - 44px - 49px - 35px);
     overflow: hidden;
     background-color: #eeeeda;
   }

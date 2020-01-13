@@ -99,7 +99,7 @@
         this.recommends = res.data.list
       })
     },
-    mounted(){
+    mounted() {
       //給getThemeTopY赋值
       this.getThemeTopY = debounce(() => {
         this.themeTopY = [];
@@ -148,7 +148,11 @@
         product.price = this.goods.nowPrice;
         product.iid = this.iid;
         //将商品添加到购物车
-        this.$store.dispatch('addCart', product)
+        this.$store.dispatch('addCart', product).then(res=>{
+          console.log(res);
+        })
+
+        //添加到购物车成功
       }
     }
   }

@@ -16,6 +16,7 @@
     </scroll>
     <back-top @click.native="backTop" v-show="isShowBackTop"/>
     <details-bottom-bar @addToCart="addToCart"/>
+    <!--<toast :message="message" :is-show="isShow"/>-->
   </div>
 </template>
 
@@ -31,6 +32,7 @@
 
   import Scroll from 'components/common/scroll/Scroll'
   import GoodsList from 'components/content/goods/GoodsList'
+  /*import Toast from 'components/common/toast/Toast'*/
 
   import {getDetails, Goods, Shop, GoodsParam, getRecommend} from 'network/details'
   import {itemListenerMixin, backTopMixin} from "common/mixin"
@@ -50,7 +52,9 @@
         recommends: [],
         themeTopY: [],
         getThemeTopY: null,
-        currentIndex: 0 //记录当前主题区域值 0 1 2 3
+        currentIndex: 0 //记录当前主题区域值 0 1 2 3,
+      /*  message:'',
+        isShow: false*/
       }
     },
     mixins: [itemListenerMixin, backTopMixin],
@@ -64,7 +68,8 @@
       DetailsParams,
       DetailsComment,
       DetailsBottomBar,
-      GoodsList
+      GoodsList,
+      /*Toast*/
     },
     created() {
       this.iid = this.$route.params.id;
@@ -150,9 +155,13 @@
         //将商品添加到购物车
         this.$store.dispatch('addCart', product).then(res=>{
           console.log(res);
+          this.$toast.show(res);
+          /*this.isShow = true;
+          this.message = res;
+          setTimeout(()=>{
+            this.isShow = false;
+          },1500)*/
         })
-
-        //添加到购物车成功
       }
     }
   }

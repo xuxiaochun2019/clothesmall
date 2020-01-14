@@ -7,7 +7,7 @@
     <div class="add-all">
       <span>合计：{{totalPrice}}</span>
     </div>
-    <div class="pay-btn">
+    <div class="pay-btn" @click="payClick">
       <div>结算({{totalCount}})</div>
     </div>
   </div>
@@ -62,6 +62,14 @@
           })
         }
         this.checkedAll = !this.checkedAll;
+      },
+      //结算
+      payClick(){
+        if(!this.totalCount){
+          this.$toast.show('请选择要结算的商品',2000);
+          return false;
+        }
+        console.log('结算');
       }
     }
   }
@@ -100,5 +108,8 @@
     bottom: 0;
     right: 0;
     margin: auto auto auto 0;
+  }
+  .pay-btn{
+    background-color: #eb4868;
   }
 </style>
